@@ -38,7 +38,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <script>
-    document.getElementById('processButton').addEventListener('click', function () {
+      document.getElementById('processButton').addEventListener('click', function () {
     const fileInput = document.getElementById('fileInput');
     const status = document.getElementById('status');
 
@@ -54,16 +54,6 @@
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: 'array' });
 
-      // Helper function to convert binary string to Blob
-      function s2ab(s) {
-        const buf = new ArrayBuffer(s.length);
-        const view = new Uint8Array(buf);
-        for (let i = 0; i < s.length; i++) {
-          view[i] = s.charCodeAt(i) & 0xff;
-        }
-        return buf;
-      }
-
       // Process each sheet
       workbook.SheetNames.forEach((sheetName) => {
         const sheetData = workbook.Sheets[sheetName];
@@ -73,13 +63,8 @@
         // Generate a file name
         const fileName = `${sheetName}.xlsx`;
 
-        // Write workbook and trigger download
-        const binaryString = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'binary' });
-        const blob = new Blob([s2ab(binaryString)], { type: 'application/octet-stream' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        link.click();
+        // Use XLSX.writeFile to download the file
+        XLSX.writeFile(newWorkbook, fileName);
       });
 
       status.textContent = 'Sheets split successfully and downloaded!';
@@ -87,6 +72,7 @@
 
     reader.readAsArrayBuffer(file);
   });
+
   </script>
 </body>
 </html>
